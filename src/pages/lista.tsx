@@ -13,9 +13,12 @@ import { IUser } from '@/types/user';
 
 export default function Lista() {
 	const [users, setUsers] = useState<Array<IUser>>([]);
+	const [isLoading, setIsLoading] = useState(false);
 
 	async function getUsersList() {
+
 		try {
+			setIsLoading(true);
 			const response = await fetch('/api/users');
 			const data = await response.json();
 
@@ -24,6 +27,8 @@ export default function Lista() {
 			setUsers(data);
 		} catch (error) {
 			console.error(error);
+		} finally {
+			setIsLoading(false);
 		}
 	}
 
@@ -35,10 +40,14 @@ export default function Lista() {
 		<div className={styles.container}>
 			<div className={styles.content}>
 				<h2>Lista de usuários</h2>
-
 				<div data-list-container>
-					{/* Exemplo */}
-					<div data-list-item>ID 323 - Usuário 323 (user-323@mail.com)</div>
+					{!isLoading ? users.map((user) => (
+						<div data-list-item key={user.id}>
+							ID {user.id} - Usuário {user.name} ({user.email})
+						</div>
+					)) : (
+						<p>Carregando...</p>
+					)}
 				</div>
 			</div>
 		</div>
