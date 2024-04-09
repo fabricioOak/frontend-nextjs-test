@@ -4,4 +4,8 @@ export interface IUser {
 	email: string;
 }
 
-export type IUserCreate = unknown;
+export interface IUserCreate {
+	name: string;
+	email: string;
+}
+
