@@ -10,8 +10,14 @@
 import styles from '@/styles/context-api.module.css';
 import { IToastMessage } from '@/types/toast-message';
 import { ToastMessage } from '@/components/ToastMessage';
+import { useToast } from '@/contexts/ToastContext';
+import { useState } from 'react';
 
 export default function ContextApi() {
+
+	const [toastMessages, setToastMessages] = useState<Array<IToastMessage>>([]);
+
+
 	const messages: Array<IToastMessage> = [
 		{
 			id: '1',
@@ -25,13 +31,27 @@ export default function ContextApi() {
 		},
 	];
 
-	function handleSuccessButtonClick() {
-		alert('Method: handleSuccessButtonClick not implemented');
-	}
+	const { addToast } = useToast();
 
-	function handleErrorButtonClick() {
-		alert('Method: handleErrorButtonClick not implemented');
-	}
+	const handleSuccessButtonClick = () => {
+		const newMessage: IToastMessage = {
+			id: Math.random().toString(),
+			message: messages[0].message,
+			type: messages[0].type,
+		};
+		setToastMessages((prevMessages) => [...prevMessages, newMessage]);
+		addToast(newMessage);
+	};
+
+	const handleErrorButtonClick = () => {
+		const newMessage: IToastMessage = {
+			id: Math.random().toString(),
+			message: messages[1].message,
+			type: messages[1].type,
+		};
+		setToastMessages((prevMessages) => [...prevMessages, newMessage]);
+		addToast(newMessage);
+	};
 
 	return (
 		<>
@@ -45,10 +65,10 @@ export default function ContextApi() {
 			</div>
 
 			<div className={styles['toast-container']}>
-				{messages.map((message) => (
+				{toastMessages.map((message) => (
 					<ToastMessage key={message.id} content={message} />
 				))}
 			</div>
 		</>
 	);
-}
+};
