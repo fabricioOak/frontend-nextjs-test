@@ -13,9 +13,27 @@
 import { NextApiRequest, NextApiResponse } from 'next/types';
 
 import { IUser } from '@/types/user.d';
+import { faker } from "@faker-js/faker";
+
+const generateUsers = (amount: number): Array<IUser> => {
+	const users: Array<IUser> = [];
+
+	for (let i = 0; i < amount; i++) {
+		const id = i + 1;
+		const name = faker.person.fullName();
+		const email = faker.internet.email();
+
+		users.push({ id, name, email });
+	}
+
+	return users;
+
+}
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
-	const users: Array<unknown> = [];
+	if (req.method !== 'GET') return res.status(405).json({ message: 'Método não permitido' });
 
-	return res.status(500).json(users);
+	const users = generateUsers(5);
+	return res.status(200).json(users);
+
 };
