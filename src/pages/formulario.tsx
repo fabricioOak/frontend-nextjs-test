@@ -9,25 +9,51 @@
  * - Lide com os possíveis erros
  */
 
+import React from 'react';
+import { useForm } from 'react-hook-form';
 import styles from '@/styles/formulario.module.css';
 
-export default function Form() {
-	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault();
+interface FormValues {
+	name: string;
+	email: string;
+}
 
-		console.log('submit');
-	}
+export default function Form() {
+	const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
+
+	const onSubmit = async (data: FormValues) => {
+		try {
+			const response = await fetch('/api/users/create', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				throw new Error('Erro ao criar o usuário');
+			}
+
+			const result = await response.json();
+			console.log('Usuário criado:', result);
+			reset();
+		} catch (error) {
+			console.error('Erro ao submeter o formulário:', error);
+		}
+	};
 
 	return (
 		<div className={styles.container}>
 			<div className={styles.content}>
-				<form onSubmit={handleSubmit}>
-					<input type="text" placeholder="Name" />
-					<input type="email" placeholder="E-mail" />
+				<form onSubmit={handleSubmit(onSubmit)}>
+					<input {...register('name', { required: 'Nome é obrigatório' })} placeholder="Nome" />
+					{errors.name && <p>{errors.name.message}</p>}
 
-					<button type="submit" data-type="confirm">
-						Enviar
-					</button>
+					<input {...register('email', { required: 'E-mail é obrigatório', pattern: { value: /^\S+@\S+$/i, message: 'E-mail inválido' } })} placeholder="E-mail" />
+					{errors.email && <p>{errors.email.message}</p>}
+
+					<button type="submit" data-type='confirm'>Enviar</button>
 				</form>
 			</div>
 		</div>
